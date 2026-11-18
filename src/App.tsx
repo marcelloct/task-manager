@@ -1,10 +1,11 @@
-import type { Task } from './types/task';
+import { TaskCounter } from './components/TaskCounter';
 import { TaskList } from './components/TaskList';
+import type { Task } from './types/task';
 
 const initialTasks: Task[] = [
-  { id: 1, title: 'Task #1', completed: true },
-  { id: 2, title: 'Task #2', completed: false },
-  { id: 3, title: 'Task #3', completed: false },
+  { id: 1, title: 'Task #1', completed: true, priority: 'high' },
+  { id: 2, title: 'Task #2', completed: false, priority: 'low' },
+  { id: 3, title: 'Task #3', completed: false, priority: 'medium' },
 ];
 
 function App() {
@@ -12,6 +13,7 @@ function App() {
     <main>
       <h1>Task Manager</h1>
       <TaskList tasks={initialTasks} />
+      <TaskCounter tasks={initialTasks} />
     </main>
   );
 }

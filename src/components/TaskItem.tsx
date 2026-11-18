@@ -4,6 +4,12 @@ type TaskItemProps = {
   task: Task;
 };
 
+const priorityColors: Record<Task['priority'], string> = {
+  low: 'green',
+  medium: 'orange',
+  high: 'red',
+};
+
 export function TaskItem({ task }: TaskItemProps) {
   return (
     <li>
@@ -12,6 +18,9 @@ export function TaskItem({ task }: TaskItemProps) {
         style={{ textDecoration: task.completed ? 'line-through' : 'none' }}
       >
         {task.title}
+      </span>{' '}
+      <span style={{ color: priorityColors[task.priority] }}>
+        {task.priority}
       </span>
     </li>
   );
