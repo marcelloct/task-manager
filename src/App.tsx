@@ -32,8 +32,11 @@ function App() {
   }
 
   function editTask(id: number, newTitle: string) {
+    const trimmed = newTitle.trim();
+    if (!trimmed) return;
+
     setTasks((prev) =>
-      prev.map((task) => (task.id === id ? { ...task, title: newTitle } : task))
+      prev.map((task) => (task.id === id ? { ...task, title: trimmed } : task))
     );
   }
 

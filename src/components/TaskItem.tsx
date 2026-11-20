@@ -64,21 +64,23 @@ export function TaskItem({ task, onEdit, onToggle, onDelete }: TaskItemProps) {
           </button>
         </>
       ) : (
-        <span
-          style={{ textDecoration: task.completed ? 'line-through' : 'none' }}
-        >
-          {task.title}
-        </span>
-      )}{' '}
-      <span style={{ color: priorityColors[task.priority] }}>
-        {task.priority}
-      </span>
-      <button type="button" onClick={startEditing}>
-        📝
-      </button>
-      <button type="button" onClick={() => onDelete(task.id)}>
-        🗑️
-      </button>
+        <>
+          <span
+            style={{ textDecoration: task.completed ? 'line-through' : 'none' }}
+          >
+            {task.title}
+          </span>{' '}
+          <span style={{ color: priorityColors[task.priority] }}>
+            {task.priority}
+          </span>
+          <button type="button" onClick={startEditing}>
+            📝
+          </button>
+          <button type="button" onClick={() => onDelete(task.id)}>
+            🗑️
+          </button>
+        </>
+      )}
     </li>
   );
 }
