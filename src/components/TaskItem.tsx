@@ -3,7 +3,7 @@ import type { Task } from '../types/task';
 
 type TaskItemProps = {
   task: Task;
-  onEdit: (id: number, newTitle: string) => void;
+  onEdit: (id: number, newTitle: string) => boolean;
   onToggle: (id: number) => void;
   onDelete: (id: number) => void;
 };
@@ -17,23 +17,35 @@ const priorityColors: Record<Task['priority'], string> = {
 export function TaskItem({ task, onEdit, onToggle, onDelete }: TaskItemProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [draft, setDraft] = useState(task.title);
+  const [error, setError] = useState<string | null>(null);
 
   function startEditing() {
     setDraft(task.title); // always starts from the current title
+    setError(null);
     setIsEditing(true);
   }
 
   function save() {
     const trimmed = draft.trim();
 
-    if (trimmed && trimmed !== task.title) {
-      onEdit(task.id, trimmed);
+    // nothing changed: just close
+    if (trimmed === task.title) {
+      cancel();
+      return;
     }
 
-    setIsEditing(false);
+    const saved = onEdit(task.id, trimmed);
+
+    if (!saved) {
+      setError('Title is empty or already exists');
+      return; // keeps the editor open
+    }
+
+    cancel(); // success: closes and clears the error
   }
 
   function cancel() {
+    setError(null);
     setIsEditing(false);
   }
 
@@ -62,6 +74,7 @@ export function TaskItem({ task, onEdit, onToggle, onDelete }: TaskItemProps) {
           <button type="button" onClick={cancel}>
             ✖️
           </button>
+          {error && <p style={{ color: 'red' }}>{error}</p>}
         </>
       ) : (
         <>

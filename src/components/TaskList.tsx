@@ -3,7 +3,7 @@ import { TaskItem } from './TaskItem';
 
 type TaskListProps = {
   tasks: Task[];
-  onEdit: (id: number, newTitle: string) => void;
+  onEdit: (id: number, newTitle: string) => boolean;
   onToggle: (id: number) => void;
   onDelete: (id: number) => void;
 };

@@ -13,16 +13,22 @@ const initialTasks: Task[] = [
 function App() {
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
 
-  function addTask(title: string, priority: Task['priority']): boolean {
-    const exists = tasks.some(
-      (task) => task.title.toLowerCase() === title.toLowerCase()
-    );
+  function titleExists(title: string, ignoreId?: number): boolean {
+    const normalized = title.trim().toLowerCase();
 
-    if (exists) return false;
+    return tasks.some(
+      (task) => task.id !== ignoreId && task.title.toLowerCase() === normalized
+    );
+  }
+
+  function addTask(title: string, priority: Task['priority']): boolean {
+    const trimmed = title.trim();
+
+    if (!trimmed || titleExists(trimmed)) return false;
 
     const newTask: Task = {
       id: Date.now(),
-      title,
+      title: trimmed,
       completed: false,
       priority,
     };
@@ -31,13 +37,15 @@ function App() {
     return true;
   }
 
-  function editTask(id: number, newTitle: string) {
+  function editTask(id: number, newTitle: string): boolean {
     const trimmed = newTitle.trim();
-    if (!trimmed) return;
+    if (!trimmed || titleExists(trimmed, id)) return false;
 
     setTasks((prev) =>
       prev.map((task) => (task.id === id ? { ...task, title: trimmed } : task))
     );
+
+    return true;
   }
 
   function toggleTask(id: number) {
