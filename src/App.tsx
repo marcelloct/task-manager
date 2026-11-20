@@ -66,6 +66,14 @@ function App() {
 
   const hasCompleted = tasks.some((task) => task.completed);
 
+  function changePriority(id: number, updatedPriority: Task['priority']) {
+    setTasks((prev) =>
+      prev.map((task) =>
+        task.id === id ? { ...task, priority: updatedPriority } : task
+      )
+    );
+  }
+
   return (
     <main>
       <h1>Task Manager</h1>
@@ -74,6 +82,7 @@ function App() {
       <TaskList
         tasks={tasks}
         onEdit={editTask}
+        onChangePriority={changePriority}
         onToggle={toggleTask}
         onDelete={deleteTask}
       />
