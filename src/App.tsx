@@ -1,7 +1,7 @@
-import { useState } from 'react';
 import { TaskCounter } from './components/TaskCounter';
 import { TaskForm } from './components/TaskForm';
 import { TaskList } from './components/TaskList';
+import { useLocalStorage } from './hooks/useLocalStorage';
 import type { Task } from './types/task';
 
 const initialTasks: Task[] = [
@@ -11,7 +11,10 @@ const initialTasks: Task[] = [
 ];
 
 function App() {
-  const [tasks, setTasks] = useState<Task[]>(initialTasks);
+  const [tasks, setTasks] = useLocalStorage<Task[]>(
+    'task-manager:tasks:v1',
+    initialTasks
+  );
 
   function titleExists(title: string, ignoreId?: number): boolean {
     const normalized = title.trim().toLowerCase();
