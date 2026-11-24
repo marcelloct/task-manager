@@ -4,3 +4,5 @@ export type Task = {
   completed: boolean;
   priority: 'low' | 'medium' | 'high';
 };
+
+export type TaskFilter = 'all' | 'active' | 'completed';

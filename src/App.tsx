@@ -1,8 +1,11 @@
+import { useState } from 'react';
+import { SearchBar } from './components/SearchBar';
 import { TaskCounter } from './components/TaskCounter';
+import { TaskFilters } from './components/TaskFilters';
 import { TaskForm } from './components/TaskForm';
 import { TaskList } from './components/TaskList';
 import { useLocalStorage } from './hooks/useLocalStorage';
-import type { Task } from './types/task';
+import type { Task, TaskFilter } from './types/task';
 
 const initialTasks: Task[] = [
   { id: 1, title: 'Task #1', completed: true, priority: 'high' },
@@ -15,6 +18,23 @@ function App() {
     'task-manager:tasks:v1',
     initialTasks
   );
+  const [filter, setFilter] = useLocalStorage<TaskFilter>(
+    'task-manager:filter:v1',
+    'all'
+  );
+  const [search, setSearch] = useState('');
+
+  const normalizedSearch = search.trim().toLowerCase();
+
+  const visibleTasks = tasks.filter((task) => {
+    const matchesFilter =
+      filter === 'all' ||
+      (filter === 'active' && !task.completed) ||
+      (filter === 'completed' && task.completed);
+    const matchesSearch = task.title.toLowerCase().includes(normalizedSearch);
+
+    return matchesFilter && matchesSearch;
+  });
 
   function titleExists(title: string, ignoreId?: number): boolean {
     const normalized = title.trim().toLowerCase();
@@ -77,21 +97,37 @@ function App() {
     );
   }
 
+  const emptyMessage =
+    tasks.length === 0
+      ? 'No tasks yet. Enjoy your day! 🎉'
+      : 'No tasks match your filters.';
+
+  const counts: Record<TaskFilter, number> = {
+    all: tasks.length,
+    active: tasks.filter((task) => !task.completed).length,
+    completed: tasks.filter((task) => task.completed).length,
+  };
+
   return (
     <main>
       <h1>Task Manager</h1>
       <TaskForm onAdd={addTask} />
+      <SearchBar value={search} onChange={setSearch} />
+      <TaskFilters filter={filter} onChange={setFilter} counts={counts} />
       <TaskCounter tasks={tasks} />
       <TaskList
-        tasks={tasks}
+        tasks={visibleTasks}
+        emptyMessage={emptyMessage}
         onEdit={editTask}
         onChangePriority={changePriority}
         onToggle={toggleTask}
         onDelete={deleteTask}
       />
-      <button type="button" onClick={clearCompleted} disabled={!hasCompleted}>
-        Clear completed
-      </button>
+      {(filter === 'all' || filter === 'completed') && (
+        <button type="button" onClick={clearCompleted} disabled={!hasCompleted}>
+          Clear completed
+        </button>
+      )}
     </main>
   );
 }
