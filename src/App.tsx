@@ -1,13 +1,12 @@
-import { LoginForm } from './components/LoginForm';
+import { RequireAuth } from './components/RequireAuth';
 import { TaskManager } from './components/TaskManager';
-import { useAuth } from './hooks/useAuth';
 
 function App() {
-  const { user } = useAuth();
-
-  if (!user) return <LoginForm />;
-
-  return <TaskManager key={user.id} user={user} />;
+  return (
+    <RequireAuth>
+      {(user) => <TaskManager key={user.id} user={user} />}
+    </RequireAuth>
+  );
 }
 
 export default App;
