@@ -4,6 +4,7 @@ import { TaskCounter } from './components/TaskCounter';
 import { TaskFilters } from './components/TaskFilters';
 import { TaskForm } from './components/TaskForm';
 import { TaskList } from './components/TaskList';
+import { ThemeToggle } from './components/ThemeToggle';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import type { Task, TaskFilter } from './types/task';
 
@@ -110,7 +111,9 @@ function App() {
 
   return (
     <main>
-      <h1>Task Manager</h1>
+      <h1>
+        Task Manager <ThemeToggle />
+      </h1>
       <TaskForm onAdd={addTask} />
       <SearchBar value={search} onChange={setSearch} />
       <TaskFilters filter={filter} onChange={setFilter} counts={counts} />

@@ -7,6 +7,19 @@
   </head>
   <body>
     <div id="root"></div>
+    <!-- Script to avoid a white 'flash' when page load and theme is set as 'dark' -->
+    <script>
+      try {
+        const stored = localStorage.getItem('task-manager:theme:v1');
+        const prefersDark = matchMedia('(prefers-color-scheme: dark)').matches;
+        const theme = stored
+          ? JSON.parse(stored)
+          : prefersDark
+            ? 'dark'
+            : 'light';
+        document.documentElement.dataset.theme = theme;
+      } catch {}
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
