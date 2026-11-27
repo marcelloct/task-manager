@@ -1,55 +1,87 @@
-import { useState, type SubmitEvent } from 'react';
+import { useActionState } from 'react';
 import type { Task } from '../types/task';
+import { SubmitButton } from './SubmitButton';
 
 type TaskFormProps = {
   onAdd: (title: string, priority: Task['priority']) => boolean;
 };
 
+type TaskFormState = {
+  titleError: string | null;
+  priorityError: string | null;
+  title: string;
+  priority: Task['priority'];
+};
+
+const initialState: TaskFormState = {
+  titleError: null,
+  priorityError: null,
+  title: '',
+  priority: 'medium',
+};
+
+// Type guard
+function isPriority(
+  value: FormDataEntryValue | null
+): value is Task['priority'] {
+  return value === 'low' || value === 'medium' || value === 'high';
+}
+
 export function TaskForm({ onAdd }: TaskFormProps) {
-  const [title, setTitle] = useState('');
-  const [priority, setPriority] = useState<Task['priority']>('medium');
-  const [error, setError] = useState<string | null>(null);
+  function addAction(prev: TaskFormState, formData: FormData): TaskFormState {
+    const title = String(formData.get('title') ?? '').trim();
+    const rawPriority = formData.get('priority');
+    const priority = isPriority(rawPriority) ? rawPriority : prev.priority;
 
-  function handleSubmit(e: SubmitEvent<HTMLFormElement>) {
-    e.preventDefault();
-
-    const trimmed = title.trim();
-
-    if (!trimmed) return;
-
-    const added = onAdd(trimmed, priority);
-
-    if (!added) {
-      setError('This task already exists');
-      return;
+    if (!title) {
+      return {
+        titleError: 'Title is required',
+        priorityError: null,
+        title,
+        priority,
+      };
     }
 
-    setError(null);
-    setTitle('');
+    if (!isPriority(rawPriority)) {
+      return { ...prev, priorityError: 'Invalid priority', title };
+    }
+
+    const added = onAdd(title, priority);
+
+    if (!added) {
+      return {
+        titleError: 'This task already exists',
+        priorityError: null,
+        title,
+        priority,
+      };
+    }
+
+    return { titleError: null, priorityError: null, title: '', priority };
   }
 
+  const [state, formAction] = useActionState(addAction, initialState);
+
   return (
-    <form onSubmit={handleSubmit}>
+    <form action={formAction}>
       <input
+        name="title"
         type="text"
-        value={title}
-        onChange={(e) => {
-          setTitle(e.target.value);
-          setError(null);
-        }}
+        defaultValue={state.title}
         placeholder="New Task"
       />
-      {error && <p>{error}</p>}
-      <select
-        value={priority}
-        onChange={(e) => setPriority(e.target.value as Task['priority'])}
-      >
+      {state.titleError && <p style={{ color: 'red' }}>{state.titleError}</p>}
+
+      <select name="priority" defaultValue={state.priority}>
         <option value="low">Low</option>
         <option value="medium">Medium</option>
         <option value="high">High</option>
       </select>
+      {state.priorityError && (
+        <p style={{ color: 'red' }}>{state.priorityError}</p>
+      )}
 
-      <button type="submit">Add</button>
+      <SubmitButton label="Add" pendingLabel="Adding..." />
     </form>
   );
 }
